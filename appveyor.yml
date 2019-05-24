@@ -1,0 +1,14 @@
+version: 1.0.0.{build}
+pull_requests:
+  do_not_increment_build_number: true
+image: Visual Studio 2017
+before_build:
+- cmd: >-
+    msbuild /t:Restore src/Xamarin.VoiceToText.sln
+
+    msbuild /t:Clean src/Xamarin.VoiceToText.sln
+
+    msbuild src/Xamarin.VoiceToText.sln
+build:
+  project: src/Xamarin.VoiceToText.sln
+  verbosity: minimal
