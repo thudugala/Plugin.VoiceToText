@@ -1,142 +1,79 @@
 <img src="Screenshots/icon.png" width="64px" >
 
-## V2.03 Release Note
-
-Fixed android focus by code keyboard pop up issue
-
-# Xamarin.KeyboardHelper
-
-This plugin includes:
-- KeyboardEnableEffect -- allows user to show/hide softkeyboard on Android/iOS platform in Xamarin.Forms
-- SoftKeyboardService -- check softkeyboard display status
-
-Note: This repo had a name change from Xamarin.EnableKeyboardEffect to Xamarin.KeyboardHelper. Please download a new version of nuget below.
+# Plugin.VoiceToText
+Convert voice input to text
 
 # Building Status
 
-<img src="https://ci.appveyor.com/api/projects/status/github/masonyc/Xamarin.KeyboardHelper?svg=true" width="100">
+<img src="https://ci.appveyor.com/api/projects/status/github/masonyc/Plugin.VoiceToText?svg=true" width="100">
 
 # Setup
 
 - Need Xamarin.Forms version 3 or above
-- `Xamarin.KeyboardHelper` Available on NuGet: https://www.nuget.org/packages/Xamarin.KeyboardHelper/2.0.3
-- Install into your platform-specific projects (iOS/Android), and any .NET Standard 2.0 projects required for your app.
-- Add ```
-        xmlns:effects="clr-namespace:Xamarin.KeyboardHelper;assembly=Xamarin.KeyboardHelper"  ```at the top of the xaml file 
+- `Plugin.VoiceToText` Available on NuGet: https://www.nuget.org/packages/Plugin.VoiceToText/
+- Install into your android projects , and any .NET Standard 2.0 projects required for your app.
   
 ## Platform Support
 
 |Platform|Supported|Version|Notes|
 | ------------------- | :-----------: | :------------------: | :------------------: |
-|Xamarin.iOS|Yes|iOS 8+| |
+|Xamarin.iOS|Yes|iOS 11+| |
 |Xamarin.Android|Yes|API 16+|Project should [target Android framework 9.0+](https://docs.microsoft.com/en-us/xamarin/android/app-fundamentals/android-api-levels?tabs=vswin#framework)|    
 
-# KeyboardEnableEffect
-
 ## For Android
-
+Add following into MainActivity class.
 ```csharp
+        private readonly int VOICE = 10; // This must be 10 because this plugin registered as 10 
+        
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            TabLayoutResource = Resource.Layout.Tabbar;
+            ToolbarResource = Resource.Layout.Toolbar;
+
             base.OnCreate(savedInstanceState);
+
+            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            
-            //need this line to init effect in android
-            Xamarin.KeyboardHelper.Platform.Droid.Effects.Init(this);
-            
+            VoiceToText.Init(this);  // Need this to init
             LoadApplication(new App());
+        }
+        
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+
+            if (requestCode == VOICE)
+            {
+                if (resultCode == Result.Ok)
+                {
+                    var matches = data.GetStringArrayListExtra(RecognizerIntent.ExtraResults);
+                    if (matches.Count != 0)
+                    {
+                        var textInput = matches[0];
+                        MessagingCenter.Send<IVoiceMessageSender, string>(this, "STT", textInput);
+                    }
+                    else
+                    {
+                        MessagingCenter.Send<IVoiceMessageSender, string>(this, "STT", "No input");
+                    }
+
+                }
+            }
+            base.OnActivityResult(requestCode, resultCode, data);
         }
 ```
 
 ## For iOS
-
+Add following into info.plist
 ```csharp
-        public override bool FinishedLaunching(UIApplication app, NSDictionary options)
-        {
-            global::Xamarin.Forms.Forms.Init();
-            
-            //need this line to init effect in iOS
-            Xamarin.KeyboardHelper.Platform.iOS.Effects.Init();
-            
-            LoadApplication(new App());
-            return base.FinishedLaunching(app, options);
-        }
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Allows you create tasks</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allows you to recognise your voice to create tasks</string>
 ```
 
 ## Usage
 
-### Show soft keyboard
-
-```csharp
-        <Entry Text="Show Keyboard" effects:KeyboardEffect.EnableKeyboard="True">
-            <Entry.Effects>
-                <effects:KeyboardEnableEffect/>
-            </Entry.Effects>
-        </Entry>
-```
-
-### Hide soft keyboard
-
-```csharp
-        <Entry Text="Hide Keyboard" effects:KeyboardEffect.EnableKeyboard="False">
-            <Entry.Effects>
-                <effects:KeyboardEnableEffect/>
-            </Entry.Effects>
-        </Entry>
-```
-
-### Bind boolean property to effect
-
-```csharp
-        <Entry Text="Toggle Keyboard" effects:KeyboardEffect.EnableKeyboard="{Binding BooleanBinding}">
-            <Entry.Effects>
-                <effects:KeyboardEnableEffect/>
-            </Entry.Effects>
-        </Entry>
-```
-
-# SoftKeyboardService
-
-## Under Page.xaml.cs or view model 
-```csharp
-        public MainPage()
-        {
-            InitializeComponent();
-
-            this.Appearing += MainPage_Appearing;
-            this.Disappearing += MainPage_Disappearing;
-        }
-
-        private void MainPage_Disappearing(object sender, EventArgs e)
-        {
-            SoftKeyboard.Current.VisibilityChanged -= Current_VisibilityChanged;
-        }
-        
-        private void MainPage_Appearing(object sender, EventArgs e)
-        {
-            SoftKeyboard.Current.VisibilityChanged += Current_VisibilityChanged;
-        }
-
-        private void Current_VisibilityChanged(SoftKeyboardEventArgs e)
-        {
-            if(e.IsVisible){
-                // do your things
-            }
-            else{
-                // do your things
-            }
-        }
-```
-
-# Demo
-
-### Android
-
-<img src="Screenshots/androidDemo.gif">
-
-### iOS
-
-<img src="Screenshots/iosDemo.gif">
+Check MainPage.xaml.cs in Sample application to see how to setup and use.
 
 # Limitations
 
