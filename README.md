@@ -11,7 +11,7 @@ Convert voice input to text
 
 - Need Xamarin.Forms version 3 or above
 - `Plugin.VoiceToText` Available on NuGet: https://www.nuget.org/packages/Plugin.VoiceToText
-- Install into your android projects , and any .NET Standard 2.0 projects required for your app.
+- Install into your platform-specific projects (iOS/Android), and any .NET Standard 2.0 projects required for your app.
   
 ## Platform Support
 
@@ -23,6 +23,8 @@ Convert voice input to text
 ## For Android
 Add following into MainActivity class.
 ```csharp
+    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity,IVoiceMessageSender
+    {
         private readonly int VOICE = 10; // This must be 10 because this plugin registered as 10 
         
         protected override void OnCreate(Bundle savedInstanceState)
@@ -60,6 +62,7 @@ Add following into MainActivity class.
             }
             base.OnActivityResult(requestCode, resultCode, data);
         }
+    }
 ```
 
 ## For iOS
