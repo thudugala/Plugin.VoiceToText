@@ -10,7 +10,7 @@ Convert voice input to text
 # Setup
 
 - Need Xamarin.Forms version 3 or above
-- `Plugin.VoiceToText` Available on NuGet: https://www.nuget.org/packages/Plugin.VoiceToText/
+- `Plugin.VoiceToText` Available on NuGet: https://www.nuget.org/packages/Plugin.VoiceToText
 - Install into your android projects , and any .NET Standard 2.0 projects required for your app.
   
 ## Platform Support
