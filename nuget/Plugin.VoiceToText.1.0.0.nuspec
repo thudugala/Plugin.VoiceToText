@@ -1,16 +1,16 @@
 ï»¿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>Xamarin.VoiceToText</id>
+    <id>Plugin.VoiceToText</id>
     <version>1.0.0</version>
     <authors>Yun Chen</authors>
     <owners>Yun Chen</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <license type="expression">MIT</license>
-    <projectUrl>https://github.com/masonyc/Xamarin.VoiceToText</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/masonyc/Xamarin.VoiceToText/master/Screenshots/icon.png</iconUrl>
+    <projectUrl>https://github.com/masonyc/Plugin.VoiceToText</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/masonyc/Plugin.VoiceToText/master/Screenshots/icon.png</iconUrl>
     <description>Package Description</description>
-    <copyright>Copyright ï¿½ Yun Chen</copyright>
+    <copyright>Copyright © Yun Chen</copyright>
     <tags>Xamarin.Forms, Xamarin.Anroid, Xamarin.iOS</tags>
     <repository type="git" />
   </metadata>

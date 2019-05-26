@@ -2,11 +2,11 @@
 using Android.App;
 using Android.Content;
 using Android.Speech;
-using Xamarin.VoiceToText.Platform.Droid;
+using Plugin.VoiceToText.Platform.Droid;
 
 [assembly: Xamarin.Forms.Dependency(typeof(VoiceToText))]
 
-namespace Xamarin.VoiceToText.Platform.Droid
+namespace Plugin.VoiceToText.Platform.Droid
 {
     public class VoiceToText : IVoiceToText 
     {

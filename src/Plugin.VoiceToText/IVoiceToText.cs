@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Xamarin.VoiceToText 
+namespace Plugin.VoiceToText 
 {
     public interface IVoiceToText
     {

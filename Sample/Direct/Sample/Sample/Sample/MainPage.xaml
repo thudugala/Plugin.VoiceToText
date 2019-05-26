@@ -2,13 +2,11 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Sample.MainPage">
-
-        <StackLayout >
-            <Button x:Name="Micro"  
+    <StackLayout>
+        <Button x:Name="Micro"  
                     Text="Start" BackgroundColor="Green" 
                     Clicked="Micro_OnClicked"
                 HorizontalOptions="CenterAndExpand"/>
-            <Label x:Name="RecordLabel"/>
-        </StackLayout>
-
+        <Label x:Name="RecordLabel"/>
+    </StackLayout>
 </ContentPage>

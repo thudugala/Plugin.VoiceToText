@@ -3,11 +3,11 @@ using Foundation;
 using Speech;
 using System;
 using Xamarin.Forms;
-using Xamarin.VoiceToText.Platform.iOS;
+using Plugin.VoiceToText.Platform.iOS;
 
 [assembly: Xamarin.Forms.Dependency(typeof(VoiceToText))]
 
-namespace Xamarin.VoiceToText.Platform.iOS 
+namespace Plugin.VoiceToText.Platform.iOS 
 {
     public class VoiceToText : IVoiceToText
     {

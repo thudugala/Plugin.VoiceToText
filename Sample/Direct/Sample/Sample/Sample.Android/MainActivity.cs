@@ -8,9 +8,9 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Android.Speech;
+using Plugin.VoiceToText;
 using Xamarin.Forms;
-using Xamarin.VoiceToText;
-using Xamarin.VoiceToText.Platform.Droid;
+using Plugin.VoiceToText.Platform.Droid;
 
 namespace Sample.Droid
 {
@@ -35,8 +35,7 @@ namespace Sample.Droid
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        }        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
 
             if (requestCode == VOICE)
