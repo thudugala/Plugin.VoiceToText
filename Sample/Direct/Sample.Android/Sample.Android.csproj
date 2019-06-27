@@ -98,7 +98,7 @@
     <Folder Include="Resources\drawable-xxxhdpi\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\src\Plugin.VoiceToText\Plugin.VoiceToText.csproj">
+    <ProjectReference Include="..\..\..\src\Plugin.VoiceToText\Plugin.VoiceToText.csproj">
       <Project>{fb8a11a9-b31a-40fd-bbd4-f09d1b82a96f}</Project>
       <Name>Plugin.VoiceToText</Name>
     </ProjectReference>

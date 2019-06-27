@@ -138,6 +138,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Plugin.VoiceToText\Plugin.VoiceToText.csproj">
+      <Project>{fb8a11a9-b31a-40fd-bbd4-f09d1b82a96f}</Project>
+      <Name>Plugin.VoiceToText</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sample\Sample.csproj">
       <Project>{D22C6B73-18A0-4E11-BD28-17FB1FA24999}</Project>
       <Name>Sample</Name>

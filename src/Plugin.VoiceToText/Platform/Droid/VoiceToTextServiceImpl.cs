@@ -30,19 +30,26 @@ namespace Plugin.VoiceToText.Platform.Droid
                 throw new AccessViolationException("You don't seem to have a microphone to record with");
             }
 
-            var voiceIntent = new Intent(RecognizerIntent.ActionRecognizeSpeech);
-            voiceIntent.PutExtra(RecognizerIntent.ExtraLanguageModel, RecognizerIntent.LanguageModelFreeForm);
+            try
+            {
+                var voiceIntent = new Intent(RecognizerIntent.ActionRecognizeSpeech);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraLanguageModel, RecognizerIntent.LanguageModelFreeForm);
 
-            voiceIntent.PutExtra(RecognizerIntent.ExtraPrompt, VoiceToTextCenter.Prompt);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraPrompt, VoiceToTextCenter.Prompt);
 
-            voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputCompleteSilenceLengthMillis, 1500);
-            voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputPossiblyCompleteSilenceLengthMillis, 1500);
-            voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputMinimumLengthMillis, 15000);
-            voiceIntent.PutExtra(RecognizerIntent.ExtraMaxResults, 1);
-            voiceIntent.PutExtra(RecognizerIntent.ExtraLanguage, Java.Util.Locale.Default);
-            voiceIntent.PutExtra(RecognizerIntent.ExtraCallingPackage, VoiceToTextCenter.MyActivity.PackageName);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputCompleteSilenceLengthMillis, 1500);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputPossiblyCompleteSilenceLengthMillis, 1500);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputMinimumLengthMillis, 15000);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraMaxResults, 1);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraLanguage, Java.Util.Locale.Default);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraCallingPackage, VoiceToTextCenter.MyActivity.PackageName);
 
-            VoiceToTextCenter.MyActivity.StartActivityForResult(voiceIntent, VoiceToTextCenter.RequestCode);
+                VoiceToTextCenter.MyActivity.StartActivityForResult(voiceIntent, VoiceToTextCenter.RequestCode);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
 
         /// <inheritdoc />

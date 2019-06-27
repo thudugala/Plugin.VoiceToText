@@ -49,11 +49,7 @@ namespace Sample
             try
             {
                 VoiceToTextCenter.Current.StartListening();
-
-                if (Device.RuntimePlatform == Device.iOS)
-                {
-                    Micro.IsEnabled = false;
-                }
+                Micro.IsEnabled = false;
             }
             catch (Exception ex)
             {
