@@ -1,24 +1,35 @@
-﻿using System;
-using Android.App;
-using Android.Content;
+﻿using Android.Content;
 using Android.Speech;
-using Plugin.VoiceToText.Platform.Droid;
-
-[assembly: Xamarin.Forms.Dependency(typeof(VoiceToText))]
+using System;
 
 namespace Plugin.VoiceToText.Platform.Droid
 {
-    public class VoiceToText : IVoiceToText 
+    /// <inheritdoc />
+    [Android.Runtime.Preserve]
+    public class VoiceToTextServiceImpl : IVoiceToTextService
     {
-        private static Activity _activity;
-        private const int Voice = 10;
+        /// <inheritdoc />
+        public event TextReceivedEventHandler TextReceived;
 
-        public static void Init(Activity activity)
+        /// <inheritdoc />
+        public event StoppedListeningEventHandler StoppedListening;
+
+        /// <inheritdoc />
+        public void OnTextReceived(TextReceivedEventArg e)
         {
-            _activity = activity;
+            TextReceived?.Invoke(e);
         }
 
-        public void StartVoiceToText()
+        /// <summary>
+        /// Internal use Only
+        /// </summary>
+        public void OnStoppedListening()
+        {
+            StoppedListening?.Invoke();
+        }
+
+        /// <inheritdoc />
+        public void StartListening()
         {
             try
             {
@@ -32,16 +43,19 @@ namespace Plugin.VoiceToText.Platform.Droid
                 voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputMinimumLengthMillis, 15000);
                 voiceIntent.PutExtra(RecognizerIntent.ExtraMaxResults, 1);
                 voiceIntent.PutExtra(RecognizerIntent.ExtraLanguage, Java.Util.Locale.Default);
-                _activity.StartActivityForResult(voiceIntent, Voice);
+
+                VoiceToTextCenter.MyActivity.StartActivityForResult(voiceIntent, VoiceToTextCenter.RequestCode);
             }
             catch (Exception ex)
             {
-               Console.WriteLine(ex.Message); 
+                Console.WriteLine(ex.Message);
             }
         }
 
-        public void StopVoiceToText()
+        /// <inheritdoc />
+        public void StopListening()
         {
+            // Ignored
         }
     }
 }

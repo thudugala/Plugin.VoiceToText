@@ -14,36 +14,42 @@ namespace Sample
     [DesignTimeVisible(true)]
     public partial class MainPage : ContentPage
     {
-        private IVoiceToText _speechRecongnitionInstance;
         public MainPage()
         {
             InitializeComponent();
-            _speechRecongnitionInstance = DependencyService.Get<IVoiceToText>();
-            MessagingCenter.Subscribe<IVoiceToText, string>(this, "STT", (sender, args) =>
-            {
-                SpeechToTextFinalResultReceived(args);
-            });
-
-            MessagingCenter.Subscribe<IVoiceToText>(this, "Final", (sender) =>
-            {
-                Micro.IsEnabled = true;
-            });
-
-            MessagingCenter.Subscribe<IVoiceMessageSender, string>(this, "STT", (sender, args) =>
-            {
-                SpeechToTextFinalResultReceived(args);
-            });
         }
-        private void SpeechToTextFinalResultReceived(string args)
+
+        protected override void OnAppearing()
         {
-            RecordLabel.Text = args;
+            base.OnAppearing();
+            VoiceToTextCenter.Current.TextReceived += Current_TextReceived;
+            VoiceToTextCenter.Current.StoppedListening += Current_StoppedListening;
+        }
+
+        protected override void OnDisappearing()
+        {
+            VoiceToTextCenter.Current.TextReceived -= Current_TextReceived;
+            VoiceToTextCenter.Current.StoppedListening -= Current_StoppedListening;
+
+            base.OnDisappearing();
+        }
+
+        private void Current_StoppedListening()
+        {
+            Micro.IsEnabled = true;
+        }
+
+        private void Current_TextReceived(TextReceivedEventArg e)
+        {
+            RecordLabel.Text = e.Text;
         }
 
         private void Micro_OnClicked(object sender, EventArgs e)
         {
             try
             {
-                _speechRecongnitionInstance.StartVoiceToText();
+                VoiceToTextCenter.Current.StartListening();
+
                 if (Device.RuntimePlatform == Device.iOS)
                 {
                     Micro.IsEnabled = false;
