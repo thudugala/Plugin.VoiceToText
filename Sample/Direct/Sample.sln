@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Android", "Sample\Sample.Android\Sample.Android.csproj", "{EAB7000E-E744-494F-99A1-C99E1D440CE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Android", "Sample.Android\Sample.Android.csproj", "{EAB7000E-E744-494F-99A1-C99E1D440CE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.iOS", "Sample\Sample.iOS\Sample.iOS.csproj", "{C65036FF-2421-4873-94AE-FAD84DF85913}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.iOS", "Sample.iOS\Sample.iOS.csproj", "{C65036FF-2421-4873-94AE-FAD84DF85913}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample\Sample.csproj", "{1CA49489-4DE7-4960-83FA-658C9AD18AEB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{1CA49489-4DE7-4960-83FA-658C9AD18AEB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.VoiceToText", "..\..\..\src\Plugin.VoiceToText\Plugin.VoiceToText.csproj", "{FB8A11A9-B31A-40FD-BBD4-F09D1B82A96F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.VoiceToText", "..\..\src\Plugin.VoiceToText\Plugin.VoiceToText.csproj", "{FB8A11A9-B31A-40FD-BBD4-F09D1B82A96F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

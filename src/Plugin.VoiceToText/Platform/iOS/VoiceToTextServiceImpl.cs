@@ -2,70 +2,101 @@
 using Foundation;
 using Speech;
 using System;
-using Xamarin.Forms;
-using Plugin.VoiceToText.Platform.iOS;
 
-[assembly: Xamarin.Forms.Dependency(typeof(VoiceToText))]
-
-namespace Plugin.VoiceToText.Platform.iOS 
+namespace Plugin.VoiceToText.Platform.iOS
 {
-    public class VoiceToText : IVoiceToText
+    /// <inheritdoc />
+    [Foundation.Preserve]
+    public class VoiceToTextServiceImpl : IVoiceToTextService
     {
         private readonly AVAudioEngine _audioEngine;
         private readonly SFSpeechRecognizer _speechRecognizer;
         private SFSpeechAudioBufferRecognitionRequest _recognitionRequest;
         private SFSpeechRecognitionTask _recognitionTask;
-        private string _recognizedString;
-        private bool _isAuthorized;
         private NSTimer _timer;
 
-        public VoiceToText()
-        {
-            AskForSpeechPermission();
+        /// <inheritdoc />
+        public event TextReceivedEventHandler TextReceived;
 
-            _audioEngine = new AVAudioEngine();
-            _speechRecognizer = new SFSpeechRecognizer();
+        /// <inheritdoc />
+        public event StoppedListeningEventHandler StoppedListening;
+
+        /// <inheritdoc />
+        public void OnTextReceived(TextReceivedEventArg e)
+        {
+            TextReceived?.Invoke(e);
         }
 
-        public void StartVoiceToText()
+        /// <inheritdoc />
+        public void OnStoppedListening()
         {
+            StoppedListening?.Invoke();
+        }
+
+        /// <inheritdoc />
+        public void StartListening()
+        {
+            if (AskForSpeechPermission())
+            {
+                return;
+            }
+
             if (_audioEngine.Running)
             {
                 StopRecordingAndRecognition();
             }
+
             StartRecordingAndRecognizing();
         }
 
-        public void StopVoiceToText()
+        /// <inheritdoc />
+        public void StopListening()
         {
+            OnStoppedListening();
             StopRecordingAndRecognition();
         }
 
-        private void AskForSpeechPermission()
+        /// <inheritdoc />
+        public VoiceToTextServiceImpl()
         {
-            SFSpeechRecognizer.RequestAuthorization(status =>
+            try
             {
-                switch (status)
-                {
-                    case SFSpeechRecognizerAuthorizationStatus.Authorized:
-                        _isAuthorized = true;
-                        break;
+                _audioEngine = new AVAudioEngine();
+                _speechRecognizer = new SFSpeechRecognizer();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
+        }
 
-                    case SFSpeechRecognizerAuthorizationStatus.Denied:
-                        break;
+        private bool AskForSpeechPermission()
+        {
+            var authorizationStatus = SFSpeechRecognizerAuthorizationStatus.Denied;
 
-                    case SFSpeechRecognizerAuthorizationStatus.NotDetermined:
-                        break;
+            SFSpeechRecognizer.RequestAuthorization(status => { authorizationStatus = status; });
 
-                    case SFSpeechRecognizerAuthorizationStatus.Restricted:
-                        break;
-                }
-            });
+            switch (authorizationStatus)
+            {
+                case SFSpeechRecognizerAuthorizationStatus.Authorized:
+                    return true;
+
+                case SFSpeechRecognizerAuthorizationStatus.Denied:
+                    throw new AccessViolationException("User denied access to speech recognition");
+
+                case SFSpeechRecognizerAuthorizationStatus.NotDetermined:
+                    throw new AccessViolationException("Speech recognition restricted on this device");
+
+                case SFSpeechRecognizerAuthorizationStatus.Restricted:
+                    throw new AccessViolationException("Speech recognition not yet authorized");
+            }
+
+            return false;
         }
 
         private void DidFinishTalk()
         {
-            MessagingCenter.Send<IVoiceToText>(this, "Final");
+            OnStoppedListening();
             if (_timer != null)
             {
                 _timer.Invalidate();
@@ -87,6 +118,7 @@ namespace Plugin.VoiceToText.Platform.iOS
                     DidFinishTalk();
                 });
 
+                // Cancel the previous task if it's running.
                 _recognitionTask?.Cancel();
                 _recognitionTask = null;
 
@@ -95,12 +127,14 @@ namespace Plugin.VoiceToText.Platform.iOS
                 audioSession.SetMode(AVAudioSession.ModeDefault, out nsError);
                 nsError = audioSession.SetActive(true, AVAudioSessionSetActiveOptions.NotifyOthersOnDeactivation);
                 audioSession.OverrideOutputAudioPort(AVAudioSessionPortOverride.Speaker, out nsError);
+
+                // Configure request so that results are returned before audio recording is finished
                 _recognitionRequest = new SFSpeechAudioBufferRecognitionRequest();
 
                 var inputNode = _audioEngine.InputNode;
                 if (inputNode == null)
                 {
-                    throw new Exception();
+                    throw new InvalidProgramException("Audio engine has no input node");
                 }
 
                 var recordingFormat = inputNode.GetBusOutputFormat(0);
@@ -112,12 +146,19 @@ namespace Plugin.VoiceToText.Platform.iOS
                 _audioEngine.Prepare();
                 _audioEngine.StartAndReturnError(out nsError);
 
+                // A recognition task represents a speech recognition session.
+                // We keep a reference to the task so that it can be cancelled.
                 _recognitionTask = _speechRecognizer.GetRecognitionTask(_recognitionRequest, (result, error) =>
                 {
                     if (result != null)
                     {
-                        _recognizedString = result.BestTranscription.FormattedString;
-                        MessagingCenter.Send<IVoiceToText, string>(this, "STT", _recognizedString);
+                        var eventArg = new TextReceivedEventArg
+                        {
+                            Text = result.BestTranscription.FormattedString
+                        };
+
+                        OnTextReceived(eventArg);
+
                         _timer.Invalidate();
                         _timer = null;
                         _timer = NSTimer.CreateRepeatingScheduledTimer(2, delegate
@@ -131,17 +172,17 @@ namespace Plugin.VoiceToText.Platform.iOS
                         return;
                     }
 
-                    MessagingCenter.Send<IVoiceToText>(this, "Final");
-                    StopRecordingAndRecognition(audioSession);
+                    OnStoppedListening();
+                    StopRecordingAndRecognition();
                 });
             }
             catch (Exception ex)
             {
-               Console.WriteLine(ex.Message); 
+                Console.WriteLine(ex.Message);
             }
         }
 
-        private void StopRecordingAndRecognition(AVAudioSession aVAudioSession = null)
+        private void StopRecordingAndRecognition()
         {
             try
             {
