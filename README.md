@@ -9,7 +9,6 @@ Convert voice input to text
 
 # Setup
 
-- Need Xamarin.Forms version 3 or above
 - `Plugin.VoiceToText` Available on NuGet: https://www.nuget.org/packages/Plugin.VoiceToText
 - Install into your platform-specific projects (iOS/Android), and any .NET Standard 2.0 projects required for your app.
   
@@ -23,10 +22,8 @@ Convert voice input to text
 ## For Android
 Add following into MainActivity class.
 ```csharp
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity,IVoiceMessageSender
-    {
-        private readonly int VOICE = 10; // This must be 10 because this plugin registered as 10 
-        
+    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    {                
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -36,30 +33,15 @@ Add following into MainActivity class.
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            VoiceToText.Init(this);  // Need this to init
+	    
+            VoiceToTextCenter.Init(this);  // Need this to init
+	    
             LoadApplication(new App());
         }
         
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-
-            if (requestCode == VOICE)
-            {
-                if (resultCode == Result.Ok)
-                {
-                    var matches = data.GetStringArrayListExtra(RecognizerIntent.ExtraResults);
-                    if (matches.Count != 0)
-                    {
-                        var textInput = matches[0];
-                        MessagingCenter.Send<IVoiceMessageSender, string>(this, "STT", textInput);
-                    }
-                    else
-                    {
-                        MessagingCenter.Send<IVoiceMessageSender, string>(this, "STT", "No input");
-                    }
-
-                }
-            }
+            VoiceToTextCenter.OnTextReceived(requestCode, resultCode, data);
             base.OnActivityResult(requestCode, resultCode, data);
         }
     }
