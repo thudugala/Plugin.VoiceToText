@@ -18,6 +18,11 @@
         /// <summary>
         /// Internal use Only
         /// </summary>
+        void OnStoppedListening();
+
+        /// <summary>
+        /// Internal use Only
+        /// </summary>
         /// <param name="e"></param>
         void OnTextReceived(TextReceivedEventArg e);
 

@@ -16,9 +16,9 @@ namespace Plugin.VoiceToText
         public static string Prompt { get; set; } = "Speak now";
 
         /// <summary>
-        /// This plugin registered as 1995
+        /// This plugin registered as 19951984
         /// </summary>
-        internal const int RequestCode = 1995;
+        internal const int RequestCode = 10;
 
         /// <summary>
         /// Init Pluggin.
@@ -48,21 +48,25 @@ namespace Plugin.VoiceToText
         {
             try
             {
-                if (requestCode != RequestCode || resultCode != Result.Ok)
+                if (requestCode != RequestCode)
                 {
                     return;
                 }
 
-                var matches = data.GetStringArrayListExtra(RecognizerIntent.ExtraResults);
-                if (matches.Any())
+                if (resultCode == Result.Ok)
                 {
-                    var eventArg = new TextReceivedEventArg
+                    var matches = data.GetStringArrayListExtra(RecognizerIntent.ExtraResults);
+                    if (matches.Any())
                     {
-                        Text = matches[0]
-                    };
+                        var eventArg = new TextReceivedEventArg
+                        {
+                            Text = matches[0]
+                        };
 
-                    Current.OnTextReceived(eventArg);
+                        Current.OnTextReceived(eventArg);
+                    }
                 }
+                Current.OnStoppedListening();
             }
             catch (Exception ex)
             {

@@ -27,9 +27,7 @@ namespace Plugin.VoiceToText.Platform.iOS
             TextReceived?.Invoke(e);
         }
 
-        /// <summary>
-        /// Internal use Only
-        /// </summary>
+        /// <inheritdoc />
         public void OnStoppedListening()
         {
             StoppedListening?.Invoke();

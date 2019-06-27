@@ -18,6 +18,11 @@ namespace Plugin.VoiceToText.Platform.Droid
         public void OnTextReceived(TextReceivedEventArg e)
         {
             TextReceived?.Invoke(e);
+        }
+
+        /// <inheritdoc />
+        public void OnStoppedListening()
+        {
             StoppedListening?.Invoke();
         }
 
