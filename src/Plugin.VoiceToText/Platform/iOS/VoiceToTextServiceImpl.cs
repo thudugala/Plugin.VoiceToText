@@ -2,8 +2,6 @@
 using Foundation;
 using Speech;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Plugin.VoiceToText.Platform.iOS
 {
@@ -15,7 +13,6 @@ namespace Plugin.VoiceToText.Platform.iOS
         private readonly SFSpeechRecognizer _speechRecognizer;
         private SFSpeechAudioBufferRecognitionRequest _recognitionRequest;
         private SFSpeechRecognitionTask _recognitionTask;
-        private bool _isAuthorized;
         private NSTimer _timer;
 
         /// <inheritdoc />
@@ -41,42 +38,24 @@ namespace Plugin.VoiceToText.Platform.iOS
         /// <inheritdoc />
         public void StartListening()
         {
-            try
+            if (AskForSpeechPermission())
             {
-                if (_isAuthorized)
-                {
-                    return;
-                }
-
-                if (_audioEngine.Running)
-                {
-                    StopRecordingAndRecognition();
-                }
-
-                StartRecordingAndRecognizing();
+                return;
             }
-            catch (Exception ex)
+
+            if (_audioEngine.Running)
             {
-                System.Diagnostics.Debug.WriteLine(ex);
+                StopRecordingAndRecognition();
             }
+
+            StartRecordingAndRecognizing();
         }
 
         /// <inheritdoc />
         public void StopListening()
         {
-            try
-            {
-                if (_isAuthorized)
-                {
-                    return;
-                }
-
-                StopRecordingAndRecognition();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
+            OnStoppedListening();
+            StopRecordingAndRecognition();
         }
 
         /// <inheritdoc />
@@ -84,8 +63,6 @@ namespace Plugin.VoiceToText.Platform.iOS
         {
             try
             {
-                AskForSpeechPermission();
-
                 _audioEngine = new AVAudioEngine();
                 _speechRecognizer = new SFSpeechRecognizer();
             }
@@ -95,26 +72,28 @@ namespace Plugin.VoiceToText.Platform.iOS
             }
         }
 
-        private void AskForSpeechPermission()
+        private bool AskForSpeechPermission()
         {
-            SFSpeechRecognizer.RequestAuthorization(status =>
+            var authorizationStatus = SFSpeechRecognizerAuthorizationStatus.Denied;
+
+            SFSpeechRecognizer.RequestAuthorization(status => { authorizationStatus = status; });
+
+            switch (authorizationStatus)
             {
-                switch (status)
-                {
-                    case SFSpeechRecognizerAuthorizationStatus.Authorized:
-                        _isAuthorized = true;
-                        break;
+                case SFSpeechRecognizerAuthorizationStatus.Authorized:
+                    return true;
 
-                    case SFSpeechRecognizerAuthorizationStatus.Denied:
-                        break;
+                case SFSpeechRecognizerAuthorizationStatus.Denied:
+                    throw new AccessViolationException("User denied access to speech recognition");
 
-                    case SFSpeechRecognizerAuthorizationStatus.NotDetermined:
-                        break;
+                case SFSpeechRecognizerAuthorizationStatus.NotDetermined:
+                    throw new AccessViolationException("Speech recognition restricted on this device");
 
-                    case SFSpeechRecognizerAuthorizationStatus.Restricted:
-                        break;
-                }
-            });
+                case SFSpeechRecognizerAuthorizationStatus.Restricted:
+                    throw new AccessViolationException("Speech recognition not yet authorized");
+            }
+
+            return false;
         }
 
         private void DidFinishTalk()
@@ -141,6 +120,7 @@ namespace Plugin.VoiceToText.Platform.iOS
                     DidFinishTalk();
                 });
 
+                // Cancel the previous task if it's running.
                 _recognitionTask?.Cancel();
                 _recognitionTask = null;
 
@@ -149,12 +129,14 @@ namespace Plugin.VoiceToText.Platform.iOS
                 audioSession.SetMode(AVAudioSession.ModeDefault, out nsError);
                 nsError = audioSession.SetActive(true, AVAudioSessionSetActiveOptions.NotifyOthersOnDeactivation);
                 audioSession.OverrideOutputAudioPort(AVAudioSessionPortOverride.Speaker, out nsError);
+
+                // Configure request so that results are returned before audio recording is finished
                 _recognitionRequest = new SFSpeechAudioBufferRecognitionRequest();
 
                 var inputNode = _audioEngine.InputNode;
                 if (inputNode == null)
                 {
-                    throw new Exception();
+                    throw new InvalidProgramException("Audio engine has no input node");
                 }
 
                 var recordingFormat = inputNode.GetBusOutputFormat(0);
@@ -166,6 +148,8 @@ namespace Plugin.VoiceToText.Platform.iOS
                 _audioEngine.Prepare();
                 _audioEngine.StartAndReturnError(out nsError);
 
+                // A recognition task represents a speech recognition session.
+                // We keep a reference to the task so that it can be cancelled.
                 _recognitionTask = _speechRecognizer.GetRecognitionTask(_recognitionRequest, (result, error) =>
                 {
                     if (result != null)

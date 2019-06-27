@@ -11,6 +11,11 @@ namespace Plugin.VoiceToText
         internal static Activity MyActivity { get; set; }
 
         /// <summary>
+        /// Prompt Text
+        /// </summary>
+        public static string Prompt { get; set; } = "Speak now";
+
+        /// <summary>
         /// This plugin registered as 1995
         /// </summary>
         internal const int RequestCode = 1995;
