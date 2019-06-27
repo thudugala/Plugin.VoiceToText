@@ -16,6 +16,11 @@ namespace Plugin.VoiceToText
         public static string Prompt { get; set; } = "Speak now";
 
         /// <summary>
+        /// Voice Language, Java.Util.Locale.Default
+        /// </summary>
+        public static Java.Util.Locale Language { get; set; } = Java.Util.Locale.Default;
+
+        /// <summary>
         /// This plugin registered as 19951984
         /// </summary>
         internal const int RequestCode = 10;

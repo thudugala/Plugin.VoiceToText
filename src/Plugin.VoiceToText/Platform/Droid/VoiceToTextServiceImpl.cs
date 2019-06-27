@@ -46,7 +46,7 @@ namespace Plugin.VoiceToText.Platform.Droid
                 voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputPossiblyCompleteSilenceLengthMillis, 1500);
                 voiceIntent.PutExtra(RecognizerIntent.ExtraSpeechInputMinimumLengthMillis, 15000);
                 voiceIntent.PutExtra(RecognizerIntent.ExtraMaxResults, 1);
-                voiceIntent.PutExtra(RecognizerIntent.ExtraLanguage, Java.Util.Locale.Default);
+                voiceIntent.PutExtra(RecognizerIntent.ExtraLanguage, VoiceToTextCenter.Language);
                 voiceIntent.PutExtra(RecognizerIntent.ExtraCallingPackage, VoiceToTextCenter.MyActivity.PackageName);
 
                 VoiceToTextCenter.MyActivity.StartActivityForResult(voiceIntent, VoiceToTextCenter.RequestCode);
